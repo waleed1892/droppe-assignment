@@ -42,13 +42,13 @@ export class ShopApp extends React.Component<
     });
   }
 
-   componentDidMount(){
-      document.title = "Droppe refactor app"
-   }
+  componentDidMount() {
+    document.title = "Droppe refactor app"
+  }
 
   favClick(title: string) {
     const prods = this.state.products;
-    const idx = lodash.findIndex(prods, {title: title})
+    const idx = lodash.findIndex(prods, { title: title })
     let currentFavs = this.state.numFavorites
     let totalFavs: any;
 
@@ -72,41 +72,33 @@ export class ShopApp extends React.Component<
     });
 
     this.setState({
-      products: updated,
-      prodCount: lodash.size(this.state.products) + 1
-    });
-
-    this.setState({
       isOpen: false,
-    });
-
-    this.setState({
-      isShowingMessage: true,
-      message: 'Adding product...'
-    })
-
-    // **this POST request doesn't actually post anything to any database**
-    fetch('https://fakestoreapi.com/products',{
-            method:"POST",
-            body:JSON.stringify(
-                {
-                    title: payload.title,
-                    price: payload.price,
-                    description: payload.description,
-                }
-            )
+    }, () => {
+      this.setState({
+        isShowingMessage: true,
+        message: 'Adding product...'
+      }, () => {
+        // **this POST request doesn't actually post anything to any database**
+        fetch('https://fakestoreapi.com/products', {
+          method: "POST",
+          body: JSON.stringify(
+            {
+              title: payload.title,
+              price: payload.price,
+              description: payload.description,
+            }
+          )
         })
-            .then(res=>res.json())
-            .then(json => {
-               (function (t) {
-                 setTimeout(()=>{
-                    t.setState({
-                       isShowingMessage: false,
-                       message: ''
-                    })
-                 }, 2000)
-              })(this);
+          .then(res => res.json())
+          .then(json => {
+            this.setState({
+              products: updated,
+              prodCount: updated.length,
+              isShowingMessage: false
             })
+          })
+      })
+    })
   }
 
   render() {
@@ -120,29 +112,29 @@ export class ShopApp extends React.Component<
         </div>
 
         <>
-           <span
-              className={['container', styles.main].join(' ')}
-              style={{margin: '50px inherit', display: 'flex', justifyContent: 'space-evenly'}}
-           >
-            <img src={img1} style={{maxHeight: "15em", display: 'block'}} />
-            <img src={img2} style={{maxHeight: "15rem", display: 'block'}} />
-           </span>
+          <span
+            className={['container', styles.main].join(' ')}
+            style={{ margin: '50px inherit', display: 'flex', justifyContent: 'space-evenly' }}
+          >
+            <img src={img1} style={{ maxHeight: "15em", display: 'block' }} />
+            <img src={img2} style={{ maxHeight: "15rem", display: 'block' }} />
+          </span>
         </>
 
-        <div className={['container', styles.main].join(' ')} style={{paddingTop: 0}}>
+        <div className={['container', styles.main].join(' ')} style={{ paddingTop: 0 }}>
           <div className={styles.buttonWrapper}>
             <span role="button">
-               <Button
-                  onClick={function (this: any) {
-                     this.setState({
-                        isOpen: true,
-                     });
-                  }.bind(this)}
-               >Send product proposal</Button>
+              <Button
+                onClick={function (this: any) {
+                  this.setState({
+                    isOpen: true,
+                  });
+                }.bind(this)}
+              >Send product proposal</Button>
             </span>
-             {this.state.isShowingMessage && <div className={styles.messageContainer}>
-                <i>{this.state.message}</i>
-             </div>}
+            {this.state.isShowingMessage && <div className={styles.messageContainer}>
+              <i>{this.state.message}</i>
+            </div>}
           </div>
 
           <div className={styles.statsContainer}>
@@ -155,26 +147,26 @@ export class ShopApp extends React.Component<
         </div>
 
         <>
-           <Modal
-              isOpen={isOpen}
-              className={styles.reactModalContent}
-              overlayClassName={styles.reactModalOverlay}
-           >
-              <div className={styles.modalContentHelper}>
-                 <div
-                    className={styles.modalClose}
-                    onClick={function (this: any) {
-                       this.setState({
-                          isOpen: false,
-                       });
-                    }.bind(this)}
-                 ><FaTimes /></div>
+          <Modal
+            isOpen={isOpen}
+            className={styles.reactModalContent}
+            overlayClassName={styles.reactModalOverlay}
+          >
+            <div className={styles.modalContentHelper}>
+              <div
+                className={styles.modalClose}
+                onClick={function (this: any) {
+                  this.setState({
+                    isOpen: false,
+                  });
+                }.bind(this)}
+              ><FaTimes /></div>
 
-                 <Form
-                    on-submit={this.onSubmit}
-                 />
-              </div>
-           </Modal>
+              <Form
+                on-submit={this.onSubmit}
+              />
+            </div>
+          </Modal>
         </>
       </React.Fragment>
     );
