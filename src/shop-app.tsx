@@ -34,7 +34,10 @@ export class ShopApp extends React.Component<
 
   componentDidMount() {
     document.title = "Droppe refactor app"
-    this.getProducts()
+    this.setState({
+      isShowingMessage: true,
+      message: 'Loading products...'
+    }, () => this.getProducts())
   }
 
   toggleModal() {
@@ -50,7 +53,8 @@ export class ShopApp extends React.Component<
       .then(data => {
         this.setState({
           products: data,
-          prodCount: data.length
+          prodCount: data.length,
+          isShowingMessage: false
         });
       });
   }
