@@ -11,7 +11,7 @@ import img2 from "./images/img2.png";
 import styles from "./shopApp.module.css";
 
 export type product = {
-  title: string; description: string, price: string, rating: { rate: number }, isFavorite: boolean
+  title: string; description: string, price: number, rating: { rate: number, count: number }, isFavorite: boolean
 }
 
 export class ShopApp extends React.Component<
@@ -55,19 +55,18 @@ export class ShopApp extends React.Component<
       });
   }
 
-  favClick(title: string) {
-    const prods = this.state.products;
-    const idx = lodash.findIndex(prods, { title: title })
-    let currentFavs = this.state.numFavorites
-    let totalFavs: any;
-
-    if (prods[idx].isFavorite) {
-      prods[idx].isFavorite = false;
-      totalFavs = --currentFavs
+  favClick(productIndex: number) {
+    const prods = lodash.cloneDeep(this.state.products)
+    const product = prods[productIndex]
+    let totalFavs = this.state.numFavorites
+    if (product.isFavorite) {
+      product.isFavorite = false
+      totalFavs = totalFavs - 1
     } else {
-      totalFavs = ++currentFavs
-      prods[idx].isFavorite = true;
+      product.isFavorite = true
+      totalFavs = totalFavs + 1
     }
+    prods[productIndex] = product
 
     this.setState(() => ({ products: prods, numFavorites: totalFavs }));
   }

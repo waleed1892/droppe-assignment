@@ -38,8 +38,8 @@ export const Form: React.FC<IFormProps> = (props) => {
     props["on-submit"]({
       title: titleRef.current && titleRef.current.value,
       description: descriptionRef.current && descriptionRef.current.value,
-      price: priceRef.current && priceRef.current.value,
-      rating: { rate: rating },
+      price: priceRef.current && Number(priceRef.current.value),
+      rating: { rate: rating, count: 0 },
       isFavorite: false
     });
 
