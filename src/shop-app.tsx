@@ -10,40 +10,49 @@ import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
 import styles from "./shopApp.module.css";
 
+export type product = {
+  title: string; description: string, price: string, rating: { rate: number }, isFavorite: boolean
+}
+
 export class ShopApp extends React.Component<
   {},
-  { products: any[]; isOpen: boolean; isShowingMessage: boolean; message: string; numFavorites: number; prodCount: number }
+  { products: product[]; isOpen: boolean; isShowingMessage: boolean; message: string; numFavorites: number; prodCount: number }
 > {
   constructor(props: any) {
     super(props);
 
     this.favClick = this.favClick.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.getProducts = this.getProducts.bind(this)
+    this.addProduct = this.addProduct.bind(this)
+    this.toggleModal = this.toggleModal.bind(this)
 
     this.state = { products: [], isOpen: false, isShowingMessage: false, message: '', numFavorites: 0, prodCount: 0 };
 
-    fetch('https://fakestoreapi.com/products').then((response) => {
-      let jsonResponse = response.json();
 
-      jsonResponse.then((rawData) => {
-        let data = [];
-
-        for (let i = 0; i < rawData.length; i++) {
-          let updatedProd = rawData[i];
-          data.push(updatedProd);
-        }
-        this.setState({
-          products: data,
-        });
-        this.setState({
-          prodCount: data.length
-        })
-      });
-    });
   }
 
   componentDidMount() {
     document.title = "Droppe refactor app"
+    this.getProducts()
+  }
+
+  toggleModal() {
+    let open = true
+    if (this.state.isOpen === true) {
+      open = false
+    }
+    this.setState({ isOpen: open })
+  }
+
+  getProducts() {
+    fetch('https://fakestoreapi.com/products').then(res => res.json())
+      .then(data => {
+        this.setState({
+          products: data,
+          prodCount: data.length
+        });
+      });
   }
 
   favClick(title: string) {
@@ -63,13 +72,37 @@ export class ShopApp extends React.Component<
     this.setState(() => ({ products: prods, numFavorites: totalFavs }));
   }
 
-  onSubmit(payload: { title: string; description: string, price: string, rating: { rate: number } }) {
+  addProduct(payload: product, updated: product[]) {
+    // **this POST request doesn't actually post anything to any database**
+    fetch('https://fakestoreapi.com/products', {
+      method: "POST",
+      body: JSON.stringify(
+        {
+          title: payload.title,
+          price: payload.price,
+          description: payload.description,
+          rating: payload.rating
+        }
+      )
+    })
+      .then(res => res.json())
+      .then(json => {
+        this.setState({
+          products: updated,
+          prodCount: updated.length,
+          isShowingMessage: false
+        })
+      })
+  }
+
+  onSubmit(payload: product) {
     const updated = lodash.clone(this.state.products);
     updated.push({
       title: payload.title,
       description: payload.description,
       price: payload.price,
-      rating: payload.rating
+      rating: payload.rating,
+      isFavorite: false
     });
 
     this.setState({
@@ -79,26 +112,7 @@ export class ShopApp extends React.Component<
         isShowingMessage: true,
         message: 'Adding product...'
       }, () => {
-        // **this POST request doesn't actually post anything to any database**
-        fetch('https://fakestoreapi.com/products', {
-          method: "POST",
-          body: JSON.stringify(
-            {
-              title: payload.title,
-              price: payload.price,
-              description: payload.description,
-              rating: payload.rating
-            }
-          )
-        })
-          .then(res => res.json())
-          .then(json => {
-            this.setState({
-              products: updated,
-              prodCount: updated.length,
-              isShowingMessage: false
-            })
-          })
+        this.addProduct(payload, updated)
       })
     })
   }
@@ -127,11 +141,7 @@ export class ShopApp extends React.Component<
           <div className={styles.buttonWrapper}>
             <span role="button">
               <Button
-                onClick={function (this: any) {
-                  this.setState({
-                    isOpen: true,
-                  });
-                }.bind(this)}
+                onClick={this.toggleModal}
               >Send product proposal</Button>
             </span>
             {this.state.isShowingMessage && <div className={styles.messageContainer}>
@@ -157,11 +167,7 @@ export class ShopApp extends React.Component<
             <div className={styles.modalContentHelper}>
               <div
                 className={styles.modalClose}
-                onClick={function (this: any) {
-                  this.setState({
-                    isOpen: false,
-                  });
-                }.bind(this)}
+                onClick={this.toggleModal}
               ><FaTimes /></div>
 
               <Form
