@@ -63,12 +63,13 @@ export class ShopApp extends React.Component<
     this.setState(() => ({ products: prods, numFavorites: totalFavs }));
   }
 
-  onSubmit(payload: { title: string; description: string, price: string }) {
+  onSubmit(payload: { title: string; description: string, price: string, rating: { rate: number } }) {
     const updated = lodash.clone(this.state.products);
     updated.push({
       title: payload.title,
       description: payload.description,
-      price: payload.price
+      price: payload.price,
+      rating: payload.rating
     });
 
     this.setState({
@@ -86,6 +87,7 @@ export class ShopApp extends React.Component<
               title: payload.title,
               price: payload.price,
               description: payload.description,
+              rating: payload.rating
             }
           )
         })

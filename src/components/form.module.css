@@ -43,3 +43,22 @@
   outline: none;
   border: 1px solid #62bfad;
 }
+
+.slider {
+  margin-bottom: 8px;
+}
+
+.slider input {
+  width: 100%;
+  margin: 8px 0px;
+}
+
+.slider .range {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slider .range p {
+  margin: 0;
+}
